@@ -1,2 +1,2 @@
-# c733-milestone
+# CMPT 733 Term Project Milestone Repo
 
