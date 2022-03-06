@@ -1,4 +1,4 @@
-import logging
+from pathlib import Path
 import multiprocessing
 from homer.analyzer import Article
 from homer.cmdline_printer import ArticlePrinter
@@ -95,19 +95,24 @@ def job(filepath):
 if __name__ == "__main__":
     files = [os.path.join(dirname, filename) for dirname, _, filenames in os.walk("data") for filename in filenames if filename.endswith(".txt")]
     process_count = multiprocessing.cpu_count()
+    if not os.path.exists("feature_progress.csv"):
+        Path("feature_progress.csv").touch()
 
-    with open("features.csv", "w") as f,\
+    with open("feature_progress.csv", "r") as f:
+        progress = {}
+        progress_reader = csv.reader(f)
+        for row in progress_reader:
+            progress[row[0]] = row[1]
+
+    with open("features.csv", "a+") as f,\
          open("feature_progress.csv", "a+") as p_f,\
          multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
         
         writer = csv.writer(f)
-        writer.writerow(columns)
+        if f.tell() == 0:
+            writer.writerow(columns)
         
-        progress = {}
-        progress_reader = csv.reader(p_f)
         progress_writer = csv.writer(p_f)
-        for row in progress_reader:
-            progress[row[0]] = row[1]
         
         files = [
             file 
