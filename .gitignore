@@ -3,3 +3,6 @@ fig/*
 env/*
 *.zip
 *.csv
+*.json
+*.txt
+.DS_Store

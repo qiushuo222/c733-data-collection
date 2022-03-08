@@ -92,20 +92,20 @@ def job(filepath):
         return accession_id, result, None
 
 
-if __name__ == "__main__":
-    files = [os.path.join(dirname, filename) for dirname, _, filenames in os.walk("data") for filename in filenames if filename.endswith(".txt")]
+def extract_all(data_dir, output_filename, progress_filename):
+    files = [os.path.join(dirname, filename) for dirname, _, filenames in os.walk(data_dir) for filename in filenames if filename.endswith(".txt")]
     process_count = multiprocessing.cpu_count()
-    if not os.path.exists("feature_progress.csv"):
-        Path("feature_progress.csv").touch()
+    if not os.path.exists(progress_filename):
+        Path(progress_filename).touch()
 
-    with open("feature_progress.csv", "r") as f:
+    with open(progress_filename, "r") as f:
         progress = {}
         progress_reader = csv.reader(f)
         for row in progress_reader:
             progress[row[0]] = row[1]
 
-    with open("features.csv", "a+") as f,\
-         open("feature_progress.csv", "a+") as p_f,\
+    with open(output_filename, "a+") as f,\
+         open(progress_filename, "a+") as p_f,\
          multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
         
         writer = csv.writer(f)
@@ -127,3 +127,7 @@ if __name__ == "__main__":
             else:
                 progress_writer.writerow((id, True, None))
                 writer.writerow(row)
+
+
+if __name__ == "__main__":
+    extract_all("data/plos/fulltext", "data/plos/plos_features.csv", "data/plos/plos_features_progress.csv")
